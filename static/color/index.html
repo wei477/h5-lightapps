@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#5b4b8a" />
+  <title>人格色彩速测 · 20 题</title>
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <style>
+    .app { background: #f6f4fb; }
+    .hero--color { background: linear-gradient(150deg, #4c3f7a, #7b5ea7 55%, #a78bd4); }
+    .q-wrap { padding: 0 16px; }
+    .q-index { font-size: 12.5px; color: var(--sub); letter-spacing: .5px; }
+    .q-text { font-size: 18px; font-weight: 700; line-height: 1.6; margin: 8px 0 18px; }
+
+    .opt {
+      display: flex; align-items: center; gap: 12px;
+      background: #fff; border: 1px solid var(--line); border-radius: 14px;
+      padding: 14px 15px; margin-bottom: 11px; cursor: pointer;
+      transition: all .16s ease; box-shadow: 0 2px 10px rgba(16,24,40,.03);
+    }
+    .opt:active { transform: scale(.99); }
+    .opt.is-picked { border-color: #7b5ea7; background: #f7f3ff; box-shadow: 0 6px 18px rgba(123,94,167,.16); }
+    .opt__dot {
+      width: 26px; height: 26px; border-radius: 50%; flex: 0 0 auto;
+      box-shadow: inset 0 0 0 3px #fff, 0 0 0 1px rgba(16,24,40,.08);
+    }
+    .opt__text { font-size: 14.5px; line-height: 1.5; color: #344054; }
+    .opt.is-picked .opt__text { color: #4c3f7a; font-weight: 600; }
+
+    .nav-row { display: flex; gap: 10px; padding: 4px 16px 0; }
+    .nav-row .btn { height: 46px; font-size: 14px; }
+
+    /* 结果 */
+    .result-card {
+      border-radius: 22px; padding: 26px 22px; color: #fff; position: relative;
+      overflow: hidden; box-shadow: 0 16px 40px rgba(16,24,40,.18);
+    }
+    .result-card::after {
+      content: ""; position: absolute; right: -50px; bottom: -60px;
+      width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,.14);
+    }
+    .rc-type { font-size: 46px; font-weight: 800; letter-spacing: 4px; line-height: 1.1; }
+    .rc-name { font-size: 15px; opacity: .92; margin-top: 4px; }
+    .rc-color { font-size: 22px; font-weight: 700; margin-top: 18px; letter-spacing: 2px; }
+    .rc-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .rc-tag {
+      background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.35);
+      padding: 4px 12px; border-radius: 999px; font-size: 12.5px;
+    }
+    .rc-scores { display: flex; gap: 8px; margin-top: 20px; }
+    .rc-score {
+      flex: 1; background: rgba(255,255,255,.16); border-radius: 10px;
+      padding: 7px 0; text-align: center; font-size: 11.5px;
+    }
+    .rc-score b { display: block; font-size: 14px; margin-bottom: 1px; }
+    .info-row { display: flex; gap: 10px; font-size: 13.5px; margin-bottom: 10px; }
+    .info-row b { flex: 0 0 60px; color: #98a2b3; font-weight: 400; }
+    .info-row span { color: #344054; }
+    .save-tip { text-align: center; font-size: 12px; color: #98a2b3; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="app app--flush">
+    <header class="hero hero--color" style="padding-bottom:30px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <a href="../index.html" style="color:#fff;text-decoration:none;font-size:13px;opacity:.85">← 返回问卷</a>
+        <span style="font-size:12px;opacity:.85" id="counter">第 1 / 20 题</span>
+      </div>
+      <h1 class="hero__title" style="font-size:21px">人格色彩速测</h1>
+      <p class="hero__sub">20 题，看你的 MBTI 类型与色彩人格</p>
+      <div class="progress" style="margin-top:14px;background:rgba(255,255,255,.25)">
+        <div class="progress__bar" id="bar" style="background:#fff;width:5%"></div>
+      </div>
+    </header>
+
+    <!-- 答题 -->
+    <div id="quiz">
+      <main class="main">
+        <section class="card">
+          <div class="q-index" id="qIndex">第 1 题</div>
+          <h2 class="q-text" id="qText">—</h2>
+          <div id="opts"></div>
+        </section>
+      </main>
+      <div class="nav-row" style="padding-bottom:20px">
+        <button class="btn btn--ghost" id="prevBtn" style="flex:1">上一题</button>
+        <button class="btn btn--text" id="resetBtn" style="flex:1">重新开始</button>
+      </div>
+    </div>
+
+    <!-- 结果 -->
+    <div id="result" style="display:none">
+      <main class="main">
+        <div class="result-card" id="card">
+          <div class="rc-type" id="typeLetters">INFP</div>
+          <div class="rc-name" id="typeName">调停者型</div>
+          <div class="rc-color" id="colorName">月光紫</div>
+          <div class="rc-tags" id="tags"></div>
+          <div class="rc-scores" id="scores"></div>
+        </div>
+
+        <section class="card" style="margin-top:12px">
+          <h2 class="section-title">性格画像</h2>
+          <p class="small" style="margin:0;color:#475467" id="portrait"></p>
+        </section>
+
+        <section class="card">
+          <h2 class="section-title">关系提示</h2>
+          <div class="info-row"><b>适合搭档</b><span id="partner"></span></div>
+          <div class="info-row" style="margin-bottom:0"><b>避雷提示</b><span id="avoid"></span></div>
+        </section>
+      </main>
+
+      <div class="action-bar">
+        <button class="btn btn--primary" id="saveBtn">保存色彩卡片</button>
+        <button class="btn btn--text" id="retryBtn">重新测试</button>
+      </div>
+      <p class="save-tip">长按也可截图分享 · 结果仅供娱乐参考</p>
+    </div>
+  </div>
+
+  <canvas id="cv" width="750" height="1050" style="display:none"></canvas>
+
+  <script src="../assets/js/common.js"></script>
+  <script>
+    /* ================= 题库（20 题，4 部分 × 5 题） ================= */
+    var Q = [
+      // E / I
+      ["当你需要快速“充电”时，更倾向于选择哪种颜色的环境来恢复精力？",
+       ["鲜艳的大红色", "深沉的藏蓝色", "明亮的明黄色", "温柔的豆沙绿"], "EI"],
+      ["周末安排空闲时间，你理想中的休闲空间主色调是？",
+       ["橙色调，热闹温暖", "灰色调，安静独立", "粉色调，活泼亲切", "褐色调，低调沉稳"], "EI"],
+      ["面对压力时，哪种颜色的场景能最快让你感到平静？",
+       ["红色，通过强烈色彩释放情绪", "蓝色，靠冷静色调平复内心", "绿色，借外部互动转移注意", "紫色，独处反思慢慢消化"], "EI"],
+      ["在团队合作中，你更希望自己的工作区域被哪种颜色标识？",
+       ["鲜艳的亮色，便于协作沟通", "中性色，低调专注", "对比强烈的撞色，主动参与", "柔和的单色，独立完成"], "EI"],
+      ["如果给自己设计一个“能量补给站”，你会优先选哪种颜色？",
+       ["黄色，主动获取外部能量", "黑色，通过独处恢复", "红色，靠社交互动充电", "白色，内心独处充电"], "EI"],
+      // S / N
+      ["当你选择一件新家具时，最吸引你注意的颜色特征是？",
+       ["原木色，注重实际质感", "马卡龙色，强调设计感", "大地色系，符合日常场景", "金属色，注重创新独特"], "SN"],
+      ["对于“理想假期”，你更倾向哪种颜色主题？",
+       ["蓝白条纹，具体可体验的海滩", "渐变紫，想象中的未知体验", "绿色田野，可触摸的自然细节", "银色星空，象征无限可能"], "SN"],
+      ["学习新技能时，哪种颜色的学习材料让你更有代入感？",
+       ["橙色高亮，突出重点步骤", "彩色图表，梳理整体框架", "棕色笔记，强调具体实践", "荧光色标注，关注创新应用"], "SN"],
+      ["你更倾向于用哪种颜色来形容“成功”？",
+       ["金色，具体可见的成就", "彩虹色，多元突破与创新", "深红色，踏实积累获得认可", "蓝绿色，超越常规的独特"], "SN"],
+      ["在规划未来时，你脑海中浮现的颜色画面更偏向？",
+       ["绿色田园，具体的田园生活", "紫色迷雾，抽象的未来可能", "蓝色海洋，具体的航行目标", "银色科技，抽象的技术发展"], "SN"],
+      // T / F
+      ["面对冲突时，你更倾向于用哪种颜色的表达方式来处理？",
+       ["黑白灰，理性客观看待", "粉色调，温和共情", "蓝色，冷静梳理逻辑", "橙色调，热情调和关系"], "TF"],
+      ["在做重要决定时，哪种颜色的“清单”让你觉得更可靠？",
+       ["绿色，列出利弊客观分析", "紫色，标注情感优先级", "红色，强调关键数据", "黄色，关注结果带来的感受"], "TF"],
+      ["你认为“公平”最接近哪种颜色？",
+       ["银色，中性客观不偏不倚", "粉色，包容温暖兼顾各方", "白色，纯粹理性规则至上", "橙色，活力均衡共同利益"], "TF"],
+      ["当你需要鼓励他人时，你更倾向于选择哪种颜色的语言？",
+       ["蓝色，指出具体改进方向", "红色，热情肯定对方价值", "绿色，聚焦实际问题解决", "粉色，温柔支持对方情绪"], "TF"],
+      ["对于“理想领导者”，你更倾向哪种颜色特质？",
+       ["黑色，果断基于逻辑规则", "黄色，亲和关注团队氛围", "灰色，冷静注重效率结果", "橙色，温暖凝聚团队情感"], "TF"],
+      // J / P
+      ["你的书桌更倾向于哪种颜色的整理状态？",
+       ["红蓝分区，明确分类规划", "彩色便签堆，灵活记录", "黑白主调，简洁按计划", "渐变色装饰，随性自然"], "JP"],
+      ["对于假期计划，你更倾向于哪种颜色的时间表？",
+       ["绿色表格，详细到小时执行", "黄色便签，保留弹性空间", "蓝色清单，有序推进必做事", "紫色手账，享受过程变化"], "JP"],
+      ["你更喜欢哪种颜色的“完成”标志？",
+       ["对比强烈的勾选色，成就明确", "柔和渐变色，自然结束", "红色印章，正式确认达成", "彩色小星星，轻松标记"], "JP"],
+      ["在布置房间时，你更倾向于哪种颜色的搭配方式？",
+       ["单色系搭配，风格明确", "混撞色搭配，随性发挥", "经典色组合，遵循规则", "流动渐变色，灵活变化"], "JP"],
+      ["面对突发任务，你更倾向于用哪种颜色的便签来应对？",
+       ["黑色便签，立即规划排序", "彩色便签，灵活随机处理", "白色便签，快速记录后整理", "透明便签，不干扰原计划"], "JP"]
+    ];
+
+    /* A/C 为前极（E/S/T/J），B/D 为后极（I/N/F/P） */
+    var ACENT = ["#E4572E", "#2F5597", "#F2B705", "#7AA97F"];
+
+    var TYPES = {
+      ISTJ: "物流师型", ISFJ: "守卫者型", INFJ: "提倡者型", INTJ: "建筑师型",
+      ISTP: "鉴赏家型", ISFP: "探险家型", INFP: "调停者型", INTP: "逻辑学家型",
+      ESTP: "企业家型", ESFP: "表演者型", ENFP: "竞选者型", ENTP: "辩论家型",
+      ESTJ: "总经理型", ESFJ: "执政官型", ENFJ: "主人公型", ENTJ: "指挥官型"
+    };
+
+    /* 四色人格 = 四种气质（Keirsey） */
+    var COLORS = {
+      "SP": { name: "暖阳橙", grad: ["#F2994A", "#EB5757"], tags: ["行动派", "现场感强", "敢于试错"],
+              partner: "森林绿（稳得住你的节奏）", avoid: "计划被反复推翻会让橙型迅速失去耐心；别把“马上做”当成唯一标准。",
+              portrait: "你靠当下的手感活着：看到、摸到、试过，才知道行不行。规则太多会让你窒息，灵活的现场反而让你超常发挥。" },
+      "SJ": { name: "森林绿", grad: ["#5FA86A", "#2F7D5D"], tags: ["守护者", "有条理", "说到做到"],
+              partner: "暖阳橙（帮你把生活过出一点意外）", avoid: "别用“以前都是这么做的”堵住新方案；偶尔的失控不是灾难。",
+              portrait: "你是那种把承诺当契约的人。喜欢确定的分工、清晰的流程和可预期的结果，团队里有你就有一根定海神针。" },
+      "NF": { name: "月光紫", grad: ["#7B5EA7", "#4C3F7A"], tags: ["理想主义", "共情力强", "在意意义"],
+              partner: "深海蓝（替你把想法落成方案）", avoid: "过度的自我要求会变成内耗；不是所有关系都需要你去修复。",
+              portrait: "你对人的情绪和动机格外敏感，做事先问“这件事有意义吗”。你愿意为认同的价值投入，也容易被辜负。" },
+      "NT": { name: "深海蓝", grad: ["#3A6EA5", "#1F3C5A"], tags: ["理性者", "爱拆解", "长期主义"],
+              partner: "月光紫（提醒你人不是系统）", avoid: "把“这不合理”挂在嘴边，容易让合作方觉得被否定；结论对，方式也要对。",
+              portrait: "你习惯先把问题拆成结构再动手，讨厌含糊其辞。对你来说，好的方案要经得起推敲，哪怕它不讨喜。" }
+    };
+
+    /* ================= 状态 ================= */
+    var answers = new Array(20).fill(null);
+    var cur = 0;
+
+    var elCounter = document.getElementById("counter");
+    var elBar = document.getElementById("bar");
+    var elQIndex = document.getElementById("qIndex");
+    var elQText = document.getElementById("qText");
+    var elOpts = document.getElementById("opts");
+
+    function renderQ() {
+      var item = Q[cur];
+      elQIndex.textContent = "第 " + (cur + 1) + " 题";
+      elQText.textContent = item[0];
+      elCounter.textContent = "第 " + (cur + 1) + " / 20 题";
+      elBar.style.width = Math.round(((cur + 1) / 20) * 100) + "%";
+
+      elOpts.innerHTML = item[1].map(function (text, i) {
+        var picked = answers[cur] === i ? " is-picked" : "";
+        return '<div class="opt' + picked + '" data-i="' + i + '">' +
+          '<span class="opt__dot" style="background:' + ACENT[i] + '"></span>' +
+          '<span class="opt__text">' + text + "</span></div>";
+      }).join("");
+
+      Array.prototype.forEach.call(elOpts.querySelectorAll(".opt"), function (node) {
+        node.addEventListener("click", function () {
+          answers[cur] = Number(node.dataset.i);
+          Array.prototype.forEach.call(elOpts.querySelectorAll(".opt"), function (n) {
+            n.classList.remove("is-picked");
+          });
+          node.classList.add("is-picked");
+
+          setTimeout(function () {
+            if (cur < 19) { cur++; renderQ(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+            else finish();
+          }, 240);
+        });
+      });
+    }
+
+    /* ================= 计分 ================= */
+    function score() {
+      var dims = { EI: [0, 0], SN: [0, 0], TF: [0, 0], JP: [0, 0] };
+      Q.forEach(function (item, i) {
+        var dim = item[2];
+        var pick = answers[i];
+        var front = (pick === 0 || pick === 2);   // A / C 为前极
+        dims[dim][front ? 0 : 1]++;
+      });
+      var letters =
+        (dims.EI[0] >= 3 ? "E" : "I") +
+        (dims.SN[0] >= 3 ? "S" : "N") +
+        (dims.TF[0] >= 3 ? "T" : "F") +
+        (dims.JP[0] >= 3 ? "J" : "P");
+      return { letters: letters, dims: dims };
+    }
+
+    /* ================= 结果 ================= */
+    function finish() {
+      var s = score();
+      var L = s.letters;
+      // 气质归类：S 型看 J/P，N 型看 T/F —— 对应 SJ / SP / NF / NT
+  var temper = L[1] === "S" ? (L[3] === "J" ? "SJ" : "SP") : (L[2] === "F" ? "NF" : "NT");
+      var color = COLORS[temper];
+
+      document.getElementById("typeLetters").textContent = L;
+      document.getElementById("typeName").textContent = TYPES[L] || "";
+      document.getElementById("colorName").textContent = color.name;
+      document.getElementById("card").style.background =
+        "linear-gradient(150deg," + color.grad[0] + "," + color.grad[1] + ")";
+      document.getElementById("tags").innerHTML = color.tags.map(function (t) {
+        return '<span class="rc-tag">' + t + "</span>";
+      }).join("");
+      document.getElementById("scores").innerHTML =
+        [["E/I", s.dims.EI], ["S/N", s.dims.SN], ["T/F", s.dims.TF], ["J/P", s.dims.JP]]
+          .map(function (d) {
+            return '<div class="rc-score"><b>' + d[1][0] + " : " + d[1][1] + "</b>" + d[0] + "</div>";
+          }).join("");
+      document.getElementById("portrait").textContent = color.portrait;
+      document.getElementById("partner").textContent = color.partner;
+      document.getElementById("avoid").textContent = color.avoid;
+
+      document.getElementById("quiz").style.display = "none";
+      document.getElementById("result").style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* ================= 保存图片 ================= */
+    function saveCard() {
+      var s = score();
+      var L = s.letters;
+      // 气质归类：S 型看 J/P，N 型看 T/F —— 对应 SJ / SP / NF / NT
+  var temper = L[1] === "S" ? (L[3] === "J" ? "SJ" : "SP") : (L[2] === "F" ? "NF" : "NT");
+      var color = COLORS[temper];
+      var cv = document.getElementById("cv");
+      var ctx = cv.getContext("2d");
+
+      var g = ctx.createLinearGradient(0, 0, 750, 1050);
+      g.addColorStop(0, color.grad[0]);
+      g.addColorStop(1, color.grad[1]);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 750, 1050);
+
+      ctx.fillStyle = "rgba(255,255,255,.10)";
+      ctx.beginPath();
+      ctx.arc(640, 900, 220, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "700 26px 'PingFang SC','Microsoft YaHei',sans-serif";
+      ctx.fillText("人格色彩速测 · 我的专属卡片", 60, 96);
+
+      ctx.font = "800 132px 'PingFang SC','Microsoft YaHei',sans-serif";
+      ctx.fillText(L, 56, 260);
+
+      ctx.font = "500 34px 'PingFang SC','Microsoft YaHei',sans-serif";
+      ctx.globalAlpha = 0.92;
+      ctx.fillText(TYPES[L] || "", 62, 312);
+      ctx.globalAlpha = 1;
+
+      ctx.font = "700 56px 'PingFang SC','Microsoft YaHei',sans-serif";
+      ctx.fillText(color.name, 60, 420);
+
+      // 标签
+      var x = 60;
+      ctx.font = "500 24px 'PingFang SC','Microsoft YaHei',sans-serif";
+      color.tags.forEach(function (t) {
+        var w = ctx.measureText(t).width + 44;
+        ctx.fillStyle = "rgba(255,255,255,.20)";
+        roundRect(ctx, x, 452, w, 52, 26);
+        ctx.fill();
+        ctx.fillStyle = "#fff";
+        ctx.fillText(t, x + 22, 486);
+        x += w + 14;
+      });
+
+      // 四维得分
+      ctx.font = "400 22px 'PingFang SC','Microsoft YaHei',sans-serif";
+      var dims = [["E/I", s.dims.EI], ["S/N", s.dims.SN], ["T/F", s.dims.TF], ["J/P", s.dims.JP]];
+      dims.forEach(function (d, i) {
+        var bx = 60 + i * 165;
+        ctx.fillStyle = "rgba(255,255,255,.18)";
+        roundRect(ctx, bx, 552, 150, 96, 14);
+        ctx.fill();
+        ctx.fillStyle = "#fff";
+        ctx.font = "700 30px 'PingFang SC','Microsoft YaHei',sans-serif";
+        ctx.fillText(d[1][0] + " : " + d[1][1], bx + 26, 605);
+        ctx.font = "400 20px 'PingFang SC','Microsoft YaHei',sans-serif";
+        ctx.globalAlpha = 0.85;
+        ctx.fillText(d[0], bx + 26, 632);
+        ctx.globalAlpha = 1;
+      });
+
+      // 画像文字（手动换行）
+      ctx.font = "400 26px 'PingFang SC','Microsoft YaHei',sans-serif";
+      var words = color.portrait;
+      var line = "", y = 712;
+      for (var i = 0; i < words.length; i++) {
+        var test = line + words[i];
+        if (ctx.measureText(test).width > 630) {
+          ctx.fillText(line, 60, y); y += 42; line = words[i];
+        } else { line = test; }
+      }
+      ctx.fillText(line, 60, y);
+
+      // 页脚
+      ctx.font = "500 22px 'PingFang SC','Microsoft YaHei',sans-serif";
+      ctx.globalAlpha = 0.8;
+      ctx.fillText("202401170148 刘威 · 智能交互技术与应用 · 实验三", 60, 990);
+      ctx.globalAlpha = 1;
+
+      var a = document.createElement("a");
+      a.download = "色彩人格_" + L + "_" + color.name + ".png";
+      a.href = cv.toDataURL("image/png");
+      a.click();
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    /* ================= 绑定 ================= */
+    document.getElementById("prevBtn").addEventListener("click", function () {
+      if (cur > 0) { cur--; renderQ(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+      else H5.toast("已经是第一题了");
+    });
+    document.getElementById("resetBtn").addEventListener("click", function () {
+      answers = new Array(20).fill(null); cur = 0; renderQ();
+      H5.toast("已重新开始");
+    });
+    document.getElementById("saveBtn").addEventListener("click", saveCard);
+    document.getElementById("retryBtn").addEventListener("click", function () {
+      answers = new Array(20).fill(null); cur = 0;
+      document.getElementById("result").style.display = "none";
+      document.getElementById("quiz").style.display = "block";
+      renderQ(); window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    renderQ();
+  </script>
+</body>
+</html>
