@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#8c2f39" />
+  <title>五行命格测试 · 趣味国风</title>
+  <style>
+    :root {
+      --ink: #2b2521;
+      --paper: #f6f1e7;
+      --paper-2: #fffdf8;
+      --cinnabar: #9e2b25;
+      --cinnabar-2: #c0392b;
+      --gold: #b08d57;
+      --line: #e3d9c6;
+      --sub: #8a7c6a;
+      --font: "Songti SC", "STZhongsong", "SimSun", "PingFang SC", serif;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: #e8e0d2;
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    .app {
+      max-width: 430px; margin: 0 auto; min-height: 100vh;
+      background: var(--paper);
+      background-image:
+        radial-gradient(circle at 20% 10%, rgba(158, 43, 37, .05), transparent 40%),
+        radial-gradient(circle at 85% 70%, rgba(176, 141, 87, .08), transparent 45%);
+      padding-bottom: 30px; overflow-x: clip; position: relative;
+    }
+    /* 顶栏 */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 18px 8px;
+    }
+    .topbar a { color: var(--sub); text-decoration: none; font-size: 13px; }
+    .topbar .seal {
+      width: 34px; height: 34px; border: 1.5px solid var(--cinnabar);
+      border-radius: 6px; color: var(--cinnabar); font-size: 11px;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1.1; text-align: center; letter-spacing: 1px; font-weight: 700;
+    }
+    /* 头部 */
+    .title-wrap { text-align: center; padding: 10px 24px 20px; }
+    .title-wrap h1 {
+      font-size: 27px; margin: 0 0 8px; letter-spacing: 4px; font-weight: 700;
+    }
+    .title-wrap .sub { font-size: 12.5px; color: var(--sub); letter-spacing: 1px; }
+    .divider {
+      display: flex; align-items: center; gap: 10px; justify-content: center;
+      margin: 12px 0 4px; color: var(--gold); font-size: 12px;
+    }
+    .divider::before, .divider::after {
+      content: ""; height: 1px; width: 54px;
+      background: linear-gradient(90deg, transparent, var(--gold));
+    }
+    .divider::after { background: linear-gradient(270deg, transparent, var(--gold)); }
+
+    /* 卡片 */
+    .panel {
+      background: var(--paper-2); margin: 0 18px 14px; padding: 20px 18px;
+      border: 1px solid var(--line); border-radius: 4px;
+      box-shadow: 0 2px 0 rgba(176, 141, 87, .12), 0 12px 30px rgba(43, 37, 33, .05);
+      position: relative;
+    }
+    .panel::before {
+      content: ""; position: absolute; inset: 5px; border: 1px solid rgba(176, 141, 87, .18);
+      border-radius: 2px; pointer-events: none;
+    }
+    .panel h2 {
+      font-size: 15px; margin: 0 0 14px; letter-spacing: 2px;
+      display: flex; align-items: center; gap: 8px; font-weight: 700;
+    }
+    .panel h2 i {
+      width: 6px; height: 6px; background: var(--cinnabar); border-radius: 50%;
+      display: inline-block; font-style: normal;
+    }
+    .row { display: flex; gap: 12px; }
+    .row > * { flex: 1; min-width: 0; }
+    .label { font-size: 13px; color: var(--sub); margin-bottom: 6px; display: block; letter-spacing: 1px; }
+    input[type="date"], input[type="time"], select {
+      width: 100%; height: 46px; padding: 0 12px; font-size: 15px;
+      font-family: var(--font); color: var(--ink); background: #fbf8f1;
+      border: 1px solid var(--line); border-radius: 3px; outline: none; appearance: none;
+    }
+    input:focus, select:focus { border-color: var(--gold); background: #fffefb; }
+    .btn {
+      display: block; width: 100%; height: 50px; margin-top: 16px;
+      border: 0; border-radius: 4px; font-family: var(--font); font-size: 16px;
+      letter-spacing: 3px; font-weight: 700; cursor: pointer;
+      background: linear-gradient(135deg, #9e2b25, #c0392b); color: #fff8f2;
+      box-shadow: 0 8px 20px rgba(158, 43, 37, .25);
+      transition: transform .12s, opacity .12s;
+    }
+    .btn:active { transform: scale(.985); opacity: .93; }
+    .btn--ghost {
+      background: transparent; color: var(--cinnabar); border: 1px solid var(--cinnabar);
+      box-shadow: none; height: 44px; font-size: 14px; letter-spacing: 2px;
+    }
+    .note { font-size: 11.5px; color: var(--sub); text-align: center; padding: 0 26px; line-height: 1.8; }
+
+    /* 结果 */
+    #result { display: none; }
+    .bazi {
+      text-align: center; padding: 22px 10px 18px;
+      background: linear-gradient(180deg, #fffdf8, #f7f1e5);
+      border: 1px solid var(--line); border-radius: 4px; margin-bottom: 14px;
+    }
+    .bazi .gz { font-size: 34px; letter-spacing: 10px; color: var(--cinnabar); font-weight: 700; }
+    .bazi .ny { font-size: 15px; letter-spacing: 3px; margin-top: 8px; color: var(--ink); }
+    .bazi .el {
+      display: inline-block; margin-top: 12px; padding: 4px 16px; border-radius: 999px;
+      background: var(--cinnabar); color: #fff8f2; font-size: 13px; letter-spacing: 2px;
+    }
+    .bars { margin: 4px 0 2px; }
+    .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; font-size: 13px; }
+    .bar-row .name { width: 26px; color: var(--sub); letter-spacing: 1px; }
+    .bar-track { display: block; flex: 1; height: 8px; background: #efe7d8; border-radius: 99px; overflow: hidden; }
+    .bar-fill { display: block; height: 100%; border-radius: 99px; transition: width .6s ease; }
+    .bar-row .cnt { width: 30px; text-align: right; color: var(--sub); font-size: 12px; }
+    .el-jin .bar-fill { background: linear-gradient(90deg, #cfd6dd, #9aa6b2); }
+    .el-mu  .bar-fill { background: linear-gradient(90deg, #a8c69f, #5f9350); }
+    .el-shui .bar-fill { background: linear-gradient(90deg, #9dc3e6, #3f7fa8); }
+    .el-huo .bar-fill { background: linear-gradient(90deg, #f0a58a, #c0392b); }
+    .el-tu  .bar-fill { background: linear-gradient(90deg, #e0c9a6, #b08d57); }
+    .text-block { font-size: 14.5px; line-height: 1.9; color: #3a322c; margin: 0; }
+    .kv { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .kv span {
+      background: #f4ece0; border: 1px solid var(--line); color: #6b5c4b;
+      padding: 4px 12px; border-radius: 999px; font-size: 12.5px;
+    }
+    .swatch { display: inline-block; width: 16px; height: 16px; border-radius: 50%; vertical-align: -2px; margin-right: 5px; border: 1px solid rgba(0,0,0,.08); }
+    .stay { text-align: center; margin-top: 18px; display: flex; gap: 10px; }
+    .stay button { flex: 1; margin-top: 0; }
+    @media (min-width: 480px) {
+      body { padding: 18px 0; }
+      .app { border-radius: 22px; box-shadow: 0 20px 50px rgba(43, 37, 33, .18); overflow: hidden; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <a href="../index.html">← 返回问卷</a>
+      <div class="seal">五行<br />命格</div>
+    </div>
+
+    <div class="title-wrap">
+      <h1>五行命格</h1>
+      <div class="divider">纳音 · 速查</div>
+      <p class="sub">输入生日，看看你的本命五行</p>
+    </div>
+
+    <!-- 输入区 -->
+    <div id="form-area">
+      <div class="panel">
+        <h2><i></i>出生信息</h2>
+        <label class="label">公历出生日期</label>
+        <input type="date" id="birth" min="1948-01-01" max="2024-12-31" />
+        <div class="row" style="margin-top:14px">
+          <div>
+            <label class="label">出生时辰（选填）</label>
+            <select id="hour">
+              <option value="">不确定</option>
+              <option value="子">子时 23-01</option>
+              <option value="丑">丑时 01-03</option>
+              <option value="寅">寅时 03-05</option>
+              <option value="卯">卯时 05-07</option>
+              <option value="辰">辰时 07-09</option>
+              <option value="巳">巳时 09-11</option>
+              <option value="午">午时 11-13</option>
+              <option value="未">未时 13-15</option>
+              <option value="申">申时 15-17</option>
+              <option value="酉">酉时 17-19</option>
+              <option value="戌">戌时 19-21</option>
+              <option value="亥">亥时 21-23</option>
+            </select>
+          </div>
+        </div>
+        <p id="tip" style="display:none;color:#c0392b;font-size:13px;margin:12px 0 0;text-align:center"></p>
+        <button class="btn" id="calBtn">推 算 命 格</button>
+      </div>
+      <p class="note">
+        数据取自《纳音命格速查表（1948—2024）》，按年柱纳音定本命五行，<br />
+        再结合月令与时辰粗略统计五行分布。仅供趣味娱乐，不作命理咨询。
+      </p>
+    </div>
+
+    <!-- 结果区 -->
+    <div id="result">
+      <div class="panel">
+        <div class="bazi">
+          <div class="gz" id="ganzhi">甲子</div>
+          <div class="ny" id="nayin">海中金</div>
+          <div class="el" id="benming">本命 · 金</div>
+        </div>
+
+        <h2><i></i>五行分布</h2>
+        <div class="bars" id="bars"></div>
+        <p class="text-block small" id="lackText" style="font-size:13px;color:#8a7c6a"></p>
+      </div>
+
+      <div class="panel">
+        <h2><i></i>命格解读</h2>
+        <p class="text-block" id="persona"></p>
+      </div>
+
+      <div class="panel">
+        <h2><i></i>开运提示</h2>
+        <p class="text-block" id="lucky"></p>
+        <div class="kv" id="kv"></div>
+      </div>
+
+      <div class="panel">
+        <h2><i></i>一句寄语</h2>
+        <p class="text-block" id="blessing" style="color:#9e2b25;letter-spacing:1px"></p>
+      </div>
+
+      <div class="stay">
+        <button class="btn btn--ghost" id="againBtn">再 算 一 次</button>
+        <button class="btn btn--ghost" onclick="location.href='../color/index.html'">试试色彩人格</button>
+      </div>
+      <p class="note" style="margin-top:16px">本结果依据传统纳音速查表推演，仅供娱乐参考</p>
+    </div>
+  </div>
+
+  <script>
+    /* ============ 数据：六十甲子纳音 ============ */
+    var GAN = "甲乙丙丁戊己庚辛壬癸";
+    var ZHI = "子丑寅卯辰巳午未申酉戌亥";
+
+    // 30 个纳音，每个对应连续两组干支
+    var NAYIN = [
+      ["海中金", "学业难有大成，做事有始有终之志却常半途；心思细腻，擅长在熟悉的环境里积累。"],
+      ["炉中火", "多学少成，心性不定，口硬心软，手足不停；热情来得快，需要有人帮你把火收住。"],
+      ["大林木", "利官近贵，骨肉有刑伤；为人温良贤达，肯扛事，适合在组织里做中坚。"],
+      ["路旁土", "心直口快，利官近贵，一生衣禄丰盈；认死理也认朋友，容易被信任。"],
+      ["剑锋金", "聪明性巧，有机谋但善变，功名有分；锋芒外露，需学会藏拙。"],
+      ["山头火", "心直口快，忙碌奔波，权柄智谋，名声远播；闲不下来，越忙越有精神。"],
+      ["涧下水", "胆量较大，有权柄谋略，早年平平，中年成就，晚景大好；属于越走越顺的类型。"],
+      ["城头土", "性格猛烈，喜怒无常，早年勤俭，聪明伶俐；脾气来得快也去得快。"],
+      ["白腊金", "和气，劳碌一生，利官近贵，名利双全；能随机应变，命中有贵人。"],
+      ["杨柳木", "生活勤俭，早年财不易聚，晚景尚可；心软善救人，但容易替人操心。"],
+      ["井泉水", "心性温柔，初年颠倒，晚年利达，夫妻和顺；做事不急，后劲足。"],
+      ["屋上土", "豪杰和顺，自立家业，前运辛劳，晚年荣华；靠自己一步步垒起来。"],
+      ["霹雳火", "计算聪明，精通文武，夫妻和顺，晚年大兴；爆发力强，适合攻坚。"],
+      ["松柏木", "心性急，易好易怒，反复无常，晚景丰隆；有志气权柄，六亲少靠。"],
+      ["长流水", "劳碌，手足不停，早年难守，晚景发财；思路活，适合跑动型的事。"],
+      ["沙中金", "和气，喜好春风，遇凶化吉，骨肉少靠；外表随和，内里有主意。"],
+      ["山下火", "衣食足用，生财有道，早年劳碌，晚景兴旺；多情重恩，人缘好。"],
+      ["平地木", "和气，自营自立，早年财谷耗散，晚景得财；巧计伶俐，夫妻和顺。"],
+      ["壁上土", "尊重安稳，一生衣禄无亏，遇事逢凶化吉，有贵人提拔；稳字当头。"],
+      ["金箔金", "口快心直，早婚不宜，初年做事颠倒，中晚年财帛足用；福禄有余。"],
+      ["覆灯火", "衣食丰足，一生清闲，早年平平，中年丰厚；气象端正，宜家宜业。"],
+      ["天河水", "清闲，初年财帛耗散，后运发财兴旺；喜怒不常，名利有分。"],
+      ["大驿土", "性急，一生劳碌辛苦，财帛足用；心性聪明，六亲难靠，靠自己最稳。"],
+      ["钗钏金", "快活，利官近贵，做事敏捷，勤俭励业，福在晚年；不惹闲事，百事顺遂。"],
+      ["桑柘木", "幼年有灾，中年租用，身闲心苦；衣禄不少，父母难依，夫妻和顺。"],
+      ["大溪水", "诚实，一生利官近贵，家道兴宁；志气轩昂，计谋巧妙，文武皆通。"],
+      ["沙中土", "聪明伶俐，身闲心劳，中年事业兴隆，晚景财旺；利官近贵，禀性刚强。"],
+      ["天上火", "志高气宽，一生衣禄自然，容貌端正；口快舌硬，百事荣昌。"],
+      ["石榴木", "手足不停，名行清高，利官近贵；伶俐口辩，财帛足用。"],
+      ["大海水", "一生好行善事，多劳多管，衣食不缺，贵人提拔；刚直，兴家创业之命。"]
+    ];
+
+    // 月令五行（按公历月近似）
+    var MONTH_EL = ["土", "木", "木", "土", "火", "火", "土", "金", "金", "土", "水", "水"];
+    // 时辰地支五行
+    var ZHI_EL = {
+      "子": "水", "丑": "土", "寅": "木", "卯": "木", "辰": "土", "巳": "火",
+      "午": "火", "未": "土", "申": "金", "酉": "金", "戌": "土", "亥": "水"
+    };
+
+    var EL_COLOR = {
+      "金": "#9aa6b2", "木": "#5f9350", "水": "#3f7fa8", "火": "#c0392b", "土": "#b08d57"
+    };
+    var EL_LUCKY = {
+      "金": { colors: ["白色", "银色", "香槟金"], nums: [4, 9], dir: "西方" },
+      "木": { colors: ["青绿", "薄荷绿"], nums: [3, 8], dir: "东方" },
+      "水": { colors: ["藏青", "黑色", "雾蓝"], nums: [1, 6], dir: "北方" },
+      "火": { colors: ["朱红", "橙色", "紫色"], nums: [2, 7], dir: "南方" },
+      "土": { colors: ["米黄", "咖啡", "驼色"], nums: [5, 10], dir: "中央 / 本地" }
+    };
+    var BLESS = [
+      "命里有时终须有，命里无时莫强求——先把手里的事做扎实。",
+      "山高路远，行则将至；不必与人争先，只与自己较劲。",
+      "守得住平淡，才等得到热闹。",
+      "心宽一寸，路宽一丈。",
+      "所有的顺，都是熬出来的。",
+      "慢一点没关系，方向对了就不算绕路。"
+    ];
+
+    /* ============ 计算 ============ */
+    function elOf(nayin) {
+      return nayin.charAt(nayin.length - 1);
+    }
+
+    function calc(dateStr, hourZhi) {
+      var d = new Date(dateStr + "T00:00:00");
+      var y = d.getFullYear(), m = d.getMonth() + 1;
+
+      var idx = ((y - 4) % 60 + 60) % 60;
+      var ganzhi = GAN.charAt(idx % 10) + ZHI.charAt(idx % 12);
+      var ny = NAYIN[Math.floor(idx / 2)][0];
+      var persona = NAYIN[Math.floor(idx / 2)][1];
+      var benming = elOf(ny);
+
+      // 五行统计：年（纳音）+ 月令 + 时辰（可选）
+      var counts = { "金": 0, "木": 0, "水": 0, "火": 0, "土": 0 };
+      counts[benming] += 2;                    // 年柱权重最高
+      counts[MONTH_EL[m - 1]] += 1;            // 月令
+      if (hourZhi) counts[ZHI_EL[hourZhi]] += 1;
+
+      return {
+        ganzhi: ganzhi, nayin: ny, benming: benming, persona: persona,
+        counts: counts, monthEl: MONTH_EL[m - 1], hourZhi: hourZhi || ""
+      };
+    }
+
+    /* ============ 渲染 ============ */
+    function render(r) {
+      document.getElementById("ganzhi").textContent = r.ganzhi;
+      document.getElementById("nayin").textContent = r.nayin;
+      document.getElementById("benming").textContent = "本命 · " + r.benming;
+      document.getElementById("persona").textContent = r.persona;
+
+      // 五行条
+      var order = ["金", "木", "水", "火", "土"];
+      var cls = { "金": "el-jin", "木": "el-mu", "水": "el-shui", "火": "el-huo", "土": "el-tu" };
+      var max = Math.max.apply(null, order.map(function (k) { return r.counts[k]; }));
+      var bars = document.getElementById("bars");
+      bars.innerHTML = order.map(function (k) {
+        var w = Math.round((r.counts[k] / max) * 100);
+        return '<div class="bar-row ' + cls[k] + '">' +
+          '<span class="name">' + k + '</span>' +
+          '<span class="bar-track"><span class="bar-fill" style="width:' + w + '%"></span></span>' +
+          '<span class="cnt">' + r.counts[k] + '</span></div>';
+      }).join("");
+
+      // 最弱 / 缺
+      var weakest = order.slice().sort(function (a, b) { return r.counts[a] - r.counts[b]; })[0];
+      var zero = order.filter(function (k) { return r.counts[k] === 0; });
+      var lackKey = zero.length ? zero[0] : weakest;   // 取一个主弱项做补益建议
+      var lack = zero.length ? zero.join("、") : weakest;
+      document.getElementById("lackText").textContent =
+        "年柱纳音属" + r.benming + "，月令属" + r.monthEl +
+        (r.hourZhi ? "，时辰属" + ZHI_EL[r.hourZhi] : "") +
+        "；当前分布中「" + lack + "」最弱" +
+        (zero.length ? "（完全未出现）" : "") + "，可适当在配色与物品上补一补。";
+
+      // 开运
+      var lk = EL_LUCKY[r.benming];
+      document.getElementById("lucky").textContent =
+        "本命属" + r.benming + "，宜用" + lk.colors.slice(0, 2).join("、") +
+        "为主色，方位上亲近" + lk.dir + "；若想补「" + lackKey + "」，可加入" +
+        EL_LUCKY[lackKey].colors[0] + "作为点缀。";
+
+      document.getElementById("kv").innerHTML =
+        lk.colors.map(function (c) {
+          var hex = { "白色": "#ffffff", "银色": "#c0c6cc", "香槟金": "#e3d1a8", "青绿": "#5f9350",
+            "薄荷绿": "#a8d5ba", "藏青": "#2d3a5a", "黑色": "#1f1f1f", "雾蓝": "#9dc3e6",
+            "朱红": "#c0392b", "橙色": "#e08a3c", "紫色": "#7b5ea7", "米黄": "#eadfc4",
+            "咖啡": "#7a5a48", "驼色": "#c9a884" }[c] || "#ccc";
+          return '<span><i class="swatch" style="background:' + hex + '"></i>' + c + "</span>";
+        }).join("") +
+        '<span>幸运数字 ' + lk.nums.join(" / ") + "</span>";
+
+      // 寄语（按出生日散列，稳定不随机）
+      var seed = 0, s = r.ganzhi + r.monthEl;
+      for (var i = 0; i < s.length; i++) seed += s.charCodeAt(i);
+      document.getElementById("blessing").textContent = "「" + BLESS[seed % BLESS.length] + "」";
+
+      document.getElementById("form-area").style.display = "none";
+      document.getElementById("result").style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* ============ 交互 ============ */
+    document.getElementById("calBtn").addEventListener("click", function () {
+      var v = document.getElementById("birth").value;
+      var tip = document.getElementById("tip");
+      if (!v) { tip.textContent = "请先选择出生日期"; tip.style.display = "block"; return; }
+      var y = Number(v.slice(0, 4));
+      if (y < 1948 || y > 2024) {
+        tip.textContent = "速查表覆盖 1948—2024 年，请检查日期";
+        tip.style.display = "block"; return;
+      }
+      tip.style.display = "none";
+      render(calc(v, document.getElementById("hour").value));
+    });
+
+    document.getElementById("againBtn").addEventListener("click", function () {
+      document.getElementById("result").style.display = "none";
+      document.getElementById("form-area").style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  </script>
+</body>
+</html>
