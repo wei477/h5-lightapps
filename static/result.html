@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#12b76a" />
+  <title>提交成功 · 学生求职意向调查</title>
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <style>
+    .hero--ok { background: linear-gradient(150deg, #0f9f5c, #32d583 70%, #6ee7b7); }
+  </style>
+</head>
+<body>
+  <div class="app app--flush">
+    <header class="hero hero--ok" style="padding-bottom:38px">
+      <span class="hero__badge">提交完成</span>
+      <h1 class="hero__title" style="font-size:22px">问卷已提交，谢谢你的回答</h1>
+      <p class="hero__sub">你的选择已记录，可在个人记录中心随时查看</p>
+    </header>
+
+    <main class="main">
+      <section class="card" style="text-align:center;padding-top:22px">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12.5l5 5L20 6.5" />
+          </svg>
+        </div>
+        <h2 style="margin:0 0 6px;font-size:18px">提交成功</h2>
+        <p class="small muted" style="margin:0 0 4px" id="submitTime">—</p>
+        <p class="small muted" style="margin:0">数据仅用于就业指导分析</p>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title">本次填写摘要</h2>
+        <div id="summary">
+          <div class="record__row"><b>就业方向</b><span data-k="direction">—</span></div>
+          <div class="record__row"><b>意向行业</b><span data-k="industries">—</span></div>
+          <div class="record__row"><b>目标岗位</b><span data-k="job">—</span></div>
+          <div class="record__row"><b>期望城市</b><span data-k="city">—</span></div>
+          <div class="record__row"><b>期望月薪</b><span data-k="salary">—</span></div>
+          <div class="record__row"><b>实习经历</b><span data-k="intern">—</span></div>
+        </div>
+      </section>
+
+      <section class="card card--flat" style="background:#fffdf7;border-color:#fdecc8">
+        <p class="small" style="margin:0;color:#8a6d3b">
+          提示：同一台设备再次填写会追加一条记录，个人记录中心按时间倒序排列。
+        </p>
+      </section>
+    </main>
+
+    <div class="action-bar">
+      <a href="records.html" style="text-decoration:none">
+        <button class="btn btn--primary" type="button">查看我的记录</button>
+      </a>
+      <a href="index.html">
+        <button class="btn btn--text" type="button">返回首页</button>
+      </a>
+    </div>
+
+    <p class="foot">202401170148 刘威 · 智能交互技术与应用</p>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      var raw = sessionStorage.getItem("last_record");
+      var data = {};
+      try { data = raw ? JSON.parse(raw) : {}; } catch (e) { data = {}; }
+
+      document.getElementById("submitTime").textContent =
+        data.time ? H5.fmtTime(data.time) + " 提交" : "—";
+
+      function fill(key, text) {
+        var el = document.querySelector('[data-k="' + key + '"]');
+        if (el) el.textContent = text || "—";
+      }
+
+      fill("direction", data.direction);
+      fill("industries", (data.industries || []).join("、"));
+      fill("job", data.job);
+      fill("city", data.city);
+      fill("salary", data.salary ? "¥" + data.salary + " / 月" : "");
+      fill("intern", data.intern === "有"
+        ? "有" + (data.internDetail ? "（" + data.internDetail + "）" : "")
+        : (data.intern || ""));
+    })();
+  </script>
+</body>
+</html>
