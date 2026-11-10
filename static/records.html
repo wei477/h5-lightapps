@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#3457d5" />
+  <title>个人记录中心 · 学生求职意向调查</title>
+  <link rel="stylesheet" href="assets/css/base.css" />
+</head>
+<body>
+  <div class="app app--flush">
+    <header class="hero" style="padding-bottom:34px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <a href="index.html" style="color:#fff;text-decoration:none;font-size:13px;opacity:.85">← 返回首页</a>
+        <span id="sourceTag" style="font-size:11.5px;opacity:.8">加载中…</span>
+      </div>
+      <h1 class="hero__title" style="font-size:22px">个人记录中心</h1>
+      <p class="hero__sub">这里保存了你在本设备提交的全部问卷记录</p>
+    </header>
+
+    <main class="main">
+      <div class="stats">
+        <div class="stat"><div class="stat__num" id="totalCount">0</div><div class="stat__label">填写次数</div></div>
+        <div class="stat"><div class="stat__num" id="avgSalary">—</div><div class="stat__label">平均期望月薪</div></div>
+        <div class="stat"><div class="stat__num" id="topIndustry" style="font-size:15px;line-height:1.35;word-break:break-all">—</div><div class="stat__label">最热意向行业</div></div>
+      </div>
+
+      <div id="list" style="margin-top:14px"></div>
+    </main>
+
+    <div class="action-bar">
+      <a href="fill.html" style="text-decoration:none">
+        <button class="btn btn--primary" type="button">再填一份</button>
+      </a>
+    </div>
+
+    <p class="foot">202401170148 刘威 · 智能交互技术与应用</p>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      var list = document.getElementById("list");
+
+      function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+        });
+      }
+
+      function render(records, source) {
+        document.getElementById("sourceTag").textContent =
+          source === "server" ? "数据源：本地服务 /api" : "数据源：浏览器本地存储";
+
+        document.getElementById("totalCount").textContent = records.length;
+
+        if (!records.length) {
+          list.innerHTML =
+            '<div class="empty"><div class="empty__icon">📄</div>' +
+            "<p>还没有填写记录</p>" +
+            '<p class="small">回到首页开始填写，提交后会出现在这里</p></div>';
+          document.getElementById("avgSalary").textContent = "—";
+          document.getElementById("topIndustry").textContent = "—";
+          return;
+        }
+
+        /* 统计：平均薪资 + 最热行业 */
+        var sum = 0, n = 0, counter = {};
+        records.forEach(function (r) {
+          if (r.salary) { sum += Number(r.salary); n++; }
+          (r.industries || []).forEach(function (i) {
+            counter[i] = (counter[i] || 0) + 1;
+          });
+        });
+        document.getElementById("avgSalary").textContent = n ? Math.round(sum / n) : "—";
+
+        var top = Object.keys(counter).sort(function (a, b) { return counter[b] - counter[a]; })[0];
+        document.getElementById("topIndustry").textContent = top || "—";
+
+        /* 列表 */
+        list.innerHTML = records.map(function (r, idx) {
+          var inds = (r.industries || []).map(function (i) {
+            return '<span class="tag">' + esc(i) + "</span>";
+          }).join(" ");
+          return (
+            '<div class="record">' +
+              '<div class="record__head">' +
+                '<span class="record__title">第 ' + (records.length - idx) + " 次填写</span>" +
+                '<span class="record__time">' + H5.fmtTime(r.time) + "</span>" +
+              "</div>" +
+              '<div class="record__row"><b>就业方向</b><span>' + esc(r.direction) + "</span></div>" +
+              '<div class="record__row"><b>目标岗位</b><span>' + esc(r.job) + "</span></div>" +
+              '<div class="record__row"><b>期望城市</b><span>' + esc(r.city) + "</span></div>" +
+              '<div class="record__row"><b>期望月薪</b><span>¥' + esc(r.salary) + " / 月</span></div>" +
+              '<div class="record__row" style="align-items:flex-start"><b>意向行业</b><span>' + inds + "</span></div>" +
+              (r.intern === "有"
+                ? '<div class="record__row"><b>实习经历</b><span>' + esc(r.internDetail || "有") + "</span></div>"
+                : "") +
+            "</div>"
+          );
+        }).join("");
+      }
+
+      H5.getRecords().then(function (res) {
+        render(res.records, res.source);
+      });
+    })();
+  </script>
+</body>
+</html>
