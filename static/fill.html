@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#3457d5" />
+  <title>填写问卷 · 学生求职意向调查</title>
+  <link rel="stylesheet" href="assets/css/base.css" />
+</head>
+<body>
+  <div class="app app--flush">
+    <header class="hero" style="padding-bottom:34px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <a href="index.html" style="color:#fff;text-decoration:none;font-size:13px;opacity:.85">← 返回</a>
+        <span style="font-size:12px;opacity:.8">已完成 <b id="doneCount">0</b>/6</span>
+      </div>
+      <h1 class="hero__title" style="font-size:22px">求职意向问卷</h1>
+      <p class="hero__sub">共 8 题 · 带 * 为必答</p>
+      <div class="progress" style="margin-top:16px;background:rgba(255,255,255,.25)">
+        <div class="progress__bar" id="bar" style="background:#fff"></div>
+      </div>
+    </header>
+
+    <main class="main">
+      <form id="form" novalidate>
+        <!-- 1 就业方向 -->
+        <section class="card">
+          <div class="field" id="f-direction">
+            <label class="label"><span class="idx">1</span>你目前的就业方向是<span class="req">*</span></label>
+            <div class="options">
+              <label class="option"><input type="radio" name="direction" value="就业" /><span class="option__dot"></span><span class="option__text">直接就业</span></label>
+              <label class="option"><input type="radio" name="direction" value="考研" /><span class="option__dot"></span><span class="option__text">考研升学</span></label>
+              <label class="option"><input type="radio" name="direction" value="考公" /><span class="option__dot"></span><span class="option__text">考公 / 考编</span></label>
+              <label class="option"><input type="radio" name="direction" value="创业" /><span class="option__dot"></span><span class="option__text">自主创业</span></label>
+            </div>
+            <p class="error-text">请选择一个就业方向</p>
+          </div>
+        </section>
+
+        <!-- 2 意向行业 -->
+        <section class="card">
+          <div class="field" id="f-industry">
+            <label class="label"><span class="idx">2</span>意向行业（可多选）<span class="req">*</span></label>
+            <div class="chips">
+              <label class="chip"><input type="checkbox" name="industry" value="互联网/信息技术" />互联网/信息技术</label>
+              <label class="chip"><input type="checkbox" name="industry" value="教育" />教育</label>
+              <label class="chip"><input type="checkbox" name="industry" value="金融" />金融</label>
+              <label class="chip"><input type="checkbox" name="industry" value="制造业" />制造业</label>
+              <label class="chip"><input type="checkbox" name="industry" value="医疗健康" />医疗健康</label>
+              <label class="chip"><input type="checkbox" name="industry" value="文化传媒" />文化传媒</label>
+              <label class="chip"><input type="checkbox" name="industry" value="公共服务" />公共服务</label>
+              <label class="chip"><input type="checkbox" name="industry" value="其他" />其他</label>
+            </div>
+            <p class="error-text">至少选择一个行业</p>
+          </div>
+        </section>
+
+        <!-- 3 目标岗位 -->
+        <section class="card">
+          <div class="field" id="f-job">
+            <label class="label"><span class="idx">3</span>目标岗位<span class="req">*</span></label>
+            <input class="input" type="text" name="job" maxlength="20" placeholder="例如：算法工程师、产品经理、中学教师" />
+            <p class="error-text">请填写你希望从事的岗位</p>
+          </div>
+        </section>
+
+        <!-- 4 期望城市 -->
+        <section class="card">
+          <div class="field" id="f-city">
+            <label class="label"><span class="idx">4</span>期望工作城市<span class="req">*</span></label>
+            <select class="select" name="city">
+              <option value="">请选择</option>
+              <option>一线城市（北上广深）</option>
+              <option>新一线城市（成都、杭州等）</option>
+              <option>省会城市</option>
+              <option>回家乡 / 县域</option>
+              <option>不限，看机会</option>
+            </select>
+            <p class="error-text">请选择一个期望城市</p>
+          </div>
+        </section>
+
+        <!-- 5 期望薪资 -->
+        <section class="card">
+          <div class="field" id="f-salary">
+            <label class="label"><span class="idx">5</span>期望月薪（税前，单位：元）<span class="req">*</span></label>
+            <input class="input" type="number" name="salary" min="1000" max="100000" step="500" placeholder="例如：8000" />
+            <p class="hint">仅用于统计薪酬期望区间，不会与个人对应</p>
+            <p class="error-text">请填写 1000 ~ 100000 之间的数字</p>
+          </div>
+        </section>
+
+        <!-- 6 实习经历 -->
+        <section class="card">
+          <div class="field" id="f-intern">
+            <label class="label"><span class="idx">6</span>是否有实习经历<span class="req">*</span></label>
+            <div class="options">
+              <label class="option"><input type="radio" name="intern" value="有" /><span class="option__dot"></span><span class="option__text">有，累计 1 个月以上</span></label>
+              <label class="option"><input type="radio" name="intern" value="无" /><span class="option__dot"></span><span class="option__text">暂无实习经历</span></label>
+            </div>
+            <input class="input" id="internDetail" type="text" name="internDetail" maxlength="40"
+                   placeholder="简单说说实习单位与岗位（选填）" style="margin-top:10px;display:none" />
+            <p class="error-text">请选择一项</p>
+          </div>
+        </section>
+
+        <!-- 7 最看重的因素 -->
+        <section class="card">
+          <div class="field" style="margin-bottom:0">
+            <label class="label"><span class="idx">7</span>求职时最看重的因素（最多选 2 项）</label>
+            <div class="chips" id="factors">
+              <label class="chip"><input type="checkbox" name="factor" value="薪资待遇" />薪资待遇</label>
+              <label class="chip"><input type="checkbox" name="factor" value="发展空间" />发展空间</label>
+              <label class="chip"><input type="checkbox" name="factor" value="工作稳定" />工作稳定</label>
+              <label class="chip"><input type="checkbox" name="factor" value="城市环境" />城市环境</label>
+              <label class="chip"><input type="checkbox" name="factor" value="团队氛围" />团队氛围</label>
+            </div>
+            <p class="hint">选填，超过 2 项会提示</p>
+          </div>
+        </section>
+
+        <!-- 8 补充建议 -->
+        <section class="card">
+          <div class="field" style="margin-bottom:0">
+            <label class="label"><span class="idx">8</span>对学校就业指导的建议</label>
+            <input class="input" type="text" name="advice" maxlength="60" placeholder="选填，一句话即可" />
+          </div>
+        </section>
+      </form>
+    </main>
+
+    <div class="action-bar">
+      <button class="btn btn--primary" type="button" id="submitBtn">提交问卷</button>
+    </div>
+
+    <p class="foot">202401170148 刘威 · 智能交互技术与应用</p>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      var form = document.getElementById("form");
+      var bar = document.getElementById("bar");
+      var doneCount = document.getElementById("doneCount");
+      var internDetail = document.getElementById("internDetail");
+      var total = 6;
+
+      function val(name) {
+        var el = form.querySelector('[name="' + name + '"]:checked');
+        return el ? el.value : "";
+      }
+      function checkedAll(name) {
+        return Array.prototype.map.call(
+          form.querySelectorAll('[name="' + name + '"]:checked'),
+          function (e) { return e.value; }
+        );
+      }
+
+      /* 进度统计 */
+      function refresh() {
+        var done = 0;
+        if (val("direction")) done++;
+        if (checkedAll("industry").length) done++;
+        if (form.job.value.trim()) done++;
+        if (form.city.value) done++;
+        if (form.salary.value) done++;
+        if (val("intern")) done++;
+
+        doneCount.textContent = done;
+        bar.style.width = Math.round((done / total) * 100) + "%";
+      }
+
+      form.addEventListener("input", refresh);
+      form.addEventListener("change", function (e) {
+        if (e.target.name === "intern") {
+          internDetail.style.display = e.target.value === "有" ? "block" : "none";
+        }
+        if (e.target.name === "factor") {
+          var picked = checkedAll("factor");
+          if (picked.length > 2) {
+            e.target.checked = false;
+            H5.toast("最多选择 2 项");
+          }
+        }
+        refresh();
+      });
+
+      /* 校验 */
+      function markError(id, bad) {
+        var box = document.getElementById(id);
+        box.classList.toggle("is-error", bad);
+        return bad;
+      }
+
+      function validate() {
+        var firstBad = null;
+        var rules = [
+          ["f-direction", !val("direction")],
+          ["f-industry", checkedAll("industry").length === 0],
+          ["f-job", !form.job.value.trim()],
+          ["f-city", !form.city.value],
+          ["f-salary", !(Number(form.salary.value) >= 1000 && Number(form.salary.value) <= 100000)],
+          ["f-intern", !val("intern")]
+        ];
+        rules.forEach(function (r) {
+          if (markError(r[0], r[1]) && !firstBad) firstBad = r[0];
+        });
+        if (firstBad) {
+          var el = document.getElementById(firstBad);
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          H5.toast("还有必答题没有填写");
+          return false;
+        }
+        return true;
+      }
+
+      /* 提交 */
+      document.getElementById("submitBtn").addEventListener("click", function () {
+        if (!validate()) return;
+
+        var btn = this;
+        btn.disabled = true;
+        btn.textContent = "提交中…";
+
+        var record = {
+          id: "r_" + Date.now(),
+          time: Date.now(),
+          direction: val("direction"),
+          industries: checkedAll("industry"),
+          job: form.job.value.trim(),
+          city: form.city.value,
+          salary: Number(form.salary.value),
+          intern: val("intern"),
+          internDetail: internDetail.value.trim(),
+          factors: checkedAll("factor"),
+          advice: form.advice.value.trim()
+        };
+
+        // 结果页要用的摘要
+        sessionStorage.setItem("last_record", JSON.stringify(record));
+
+        H5.saveRecord(record).then(function (src) {
+          location.href = "result.html?src=" + src;
+        });
+      });
+
+      refresh();
+    })();
+  </script>
+</body>
+</html>
